@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using TMPro;
 
 public class Timer : MonoBehaviour
 {
-    [Header("Timer UI refrences :")]
+    [Header("Timer UI Refrences :")]
     [SerializeField] private Image uiFillImage; //the image filling/decreasing
-    [SerializeField] private Text uiText;
+    [SerializeField] private TMP_Text uiText;
 
     public int Duration {get; private set;} //read only 
 
@@ -51,7 +52,7 @@ public class Timer : MonoBehaviour
 
     //Changes the text and fill image as timer moves doown
     private void UpdateUI(int seconds) {
-        uiText.text = string.Format("{0:D2}:{1:D2}", seconds / 60, seconds % 60); //d2 Means print 2 didits even if the seconds are more than 10
+        uiText.text = string.Format("{0:D2}:{1:D2}", seconds / 60, seconds % 60); //d2 Means print 2 digits even if the seconds are more than 10
         uiFillImage.fillAmount = Mathf.InverseLerp (0, Duration, seconds);
             //inverselerp returns a value between 0 & 1 depending on the value e.g. btw 0 & 10 value is 5
     }
