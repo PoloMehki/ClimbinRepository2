@@ -11,7 +11,12 @@ public class TimerDemo : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        timer1.SetDuration (l1Duration).Begin ();
+        timer1
+        .SetDuration (l1Duration)
+        .OnBegin(() => Debug.Log ("Timer started")) 
+        .OnChange((remainingSeconds) => Debug.Log ("Timer changed : " + remainingSeconds)) //takes in an int
+        .OnEnd(() => Debug.Log ("Timer ended")) 
+        .Begin ();
         
     }
 
