@@ -2,27 +2,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Text;
 
 public class ScoreManager : MonoBehaviour
 {
 
-	public static ScoreManager instance;
+    private string scoreText;
 
-	public Text scoreText;
+    public int score = 0;
 
-	int score = 0;
-
-    // Start is called before the first frame update
+    // Start is called before the first frame updates
     void Start()
     {
-        scoreText.text = "SCORE: " + score.toString();
-
-	int score = 0; 
+        scoreText = score.ToString(); 
     }
 
-    public void addPoint()
+    // adds points for each letter guessed correctly 
+    public static string addPoints()
     {
-	score += 1;
-	scoreText.text = "SCORE: " + score.ToString();   
+	    score += 1000;
+        return "SCORE: " + score.ToString();
     }
+
+    // subtracts points for each letter guessed incorrectly
+    public static string subtractPoints()
+    {
+        score -= 250;
+        return "SCORE: " + score.ToString();
+    }
+
+    // adds points for each word guessed correctly 
+    public static string correctWord()
+    {
+        score += 10000;
+        return "SCORE: " + score.ToString();
+    }
+
+    public override string ToString()
+    {
+        return score;
+    }
+
 }
