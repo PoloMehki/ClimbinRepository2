@@ -81,11 +81,13 @@ public class script : MonoBehaviour
                 letterInWord = true;
                 correct++;
                 wordbox.GetComponentsInChildren<TextMeshProUGUI>()[i].text = inputLetter;
-                ScoreManager.addPoints();
+                Form form1 = new Form(); 
+                form1.ScoreManager.addPoints(); //will add 1000 points to the score in ScoreManager
             }
         }
         if(letterInWord == false){ //If the letter is not found in the word
-            ScoreManager.subtractPoints();
+            Form form2 = new Form();
+            form2.ScoreManager.subtractPoints(); //will subtract 250 points from the score in ScoreManager
             incorrect++;
             //changes the stage to move the character down one tile
             climbinStages[incorrect -1].SetActive(true);
@@ -99,7 +101,8 @@ public class script : MonoBehaviour
         //win
         if(correct == word.Length){
             //Makes the guessed word green
-            ScoreManager.correctWord();
+            Form form3 = new Form();
+            form3.ScoreManager.correctWord(); //will add 10000 points to the score in ScoreManager
             for(int i = 0; i < word.Length; i++){
                 wordbox.GetComponentsInChildren<TextMeshProUGUI>()[i].color = Color.green;
             }

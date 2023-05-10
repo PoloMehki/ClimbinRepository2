@@ -9,38 +9,42 @@ public class ScoreManager : MonoBehaviour
 
     public GameObject scoreText;
 
-    public int score = 0;
+    private int score = 0;
 
     // Start is called before the first frame updates
-    void Start()
+    string Start()
     {
         scoreText.GetComponent<scoreText>().text = score.ToString(); 
+        return scoreText;
     }
 
-    // adds points for each letter guessed correctly 
-    public void addPoints()
+    // adds 1000 points for each letter guessed correctly 
+    public string addPoints()
     {
 	    score += 1000;
-        scoreText.text = "SCORE: " + score.ToString();
+        scoreText.GetComponent<scoreText>().text = "SCORE: " + score.ToString();
+        return scoreText;
     }
 
-    // subtracts points for each letter guessed incorrectly
-    public void subtractPoints()
+    // subtracts 250 points for each letter guessed incorrectly
+    public string subtractPoints()
     {
         score -= 250;
-        scoreText.text = "SCORE: " + score.ToString();
+        scoreText.GetComponent<scoreText>().text = "SCORE: " + score.ToString();
+        return scoreText;
     }
 
-    // adds points for each word guessed correctly 
-    public void correctWord()
+    // adds 10000 points for each word guessed correctly 
+    public string correctWord()
     {
         score += 10000;
-        scoreText.text = "SCORE: " + score.ToString();
+        scoreText.GetComponent<scoreText>().text = "SCORE: " + score.ToString();
+        return scoreText;
     }
-    /* 
-    public override string ToString()
+
+    public Form()
     {
-        return score;
+        InitializeComponent();
     }
-    */
+
 }
