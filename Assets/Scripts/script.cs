@@ -14,10 +14,16 @@ public class script : MonoBehaviour
     [SerializeField] GameObject[] climbinStages; //the different stages, eg; each wrong guess advances the stage until you reach 5, this will result in a loss
     [SerializeField] GameObject letterButton; //The button pressed to select a letter
     [SerializeField] TextAsset possibleWord; //the word the player is attempting to guess
-
+    [SerializeField] GameObject playerChar; //player
+    [SerializeField] GameObject playerSpawn; //spawnpoint
+    public Text wordCountTxt; //updates the correct guessed
     //LETTER VARS
-    bool ban, ana, can, dan, ear, fat, gat, hin, ing, jin, kin, lin, mde, nop, oer, por, qur, ret, ste, tub, unb, ver, wea, xas, yus, zus;
-
+    bool ban, ana, can, dan, ear, fat, gat, hin, ing, jin, kin, lin, mde, nop, oer, por, qur, ret, ste, tub, unb, ver, wea, xas, yus, zus, playerActive;
+    //Button Var
+    GameObject[] btn;
+    //Counter
+    int wordCount;
+    int guessedWordCount;
 
     private void ResetKeyboard(){
         //ban, ana, can, dan, ear, fat, gat, hin, ing, jin, kin, lin, mde, nop, oer, por, qur, ret, ste, tub, unb, ver, wea, xas, yus, zus
@@ -59,6 +65,7 @@ public class script : MonoBehaviour
     {
         InitializeButtons();
         InitializeGame();
+        InitializeText();
     }
     //This will create the displays for the the keyboard
     private void InitializeButtons()
@@ -69,8 +76,42 @@ public class script : MonoBehaviour
             CreateButton(i);
         }
     }
-
+    private void InitializeText(){
+        wordCount = 0;
+        guessedWordCount = 0;
+        Instantiate(wordCountTxt, playerSpawn.transform);
+    }
+    private void UpdateText(){
+        wordCountTxt.GetComponent<Text>().text = "Words Guessed: " + guessedWordCount +"/" + wordCount;
+        Debug.Log("&&&&&&Text Updated&&&&& " +guessedWordCount + " / " + wordCount);
+    }
     private void InitializeGame() {
+        //reset data
+        incorrect = 0;
+        correct = 0;
+        wordCount = 0;
+        guessedWordCount = 0;
+    
+        CreatePlayer();
+        foreach(Button child in keyboardDisplay.GetComponentsInChildren<Button>()){
+            child.interactable = true;
+        }
+        foreach(Transform child in wordbox.GetComponentInChildren<Transform>()) {
+            Destroy(child.gameObject);
+        }
+        foreach(GameObject stage in climbinStages){
+            stage.SetActive(false);
+        }
+
+        //game generating
+        word = generateWord().ToUpper();
+        foreach(char letter in word){
+            var temp = Instantiate(letterContainer, wordbox.transform);
+        }
+        ResetKeyboard();
+        
+    }
+    private void RestartGame() {
         //reset data
         incorrect = 0;
         correct = 0;
@@ -101,11 +142,19 @@ public class script : MonoBehaviour
         temp.GetComponentInChildren<TextMeshProUGUI>().text = ((char)i).ToString();
         temp.GetComponent<Button>().onClick.AddListener(delegate { CheckLetter(((char)i).ToString()); });
     }
+
+    private void CreatePlayer(){
+        Debug.Log("Player Created");
+        if(!playerActive){
+            Instantiate(playerChar, playerSpawn.transform);
+            playerActive = true;
+        }
+    }
     //Selects a word from the possible word bank (a txt file with 5 letter words)
     private string generateWord(){
         string[] wordList = possibleWord.text.Split('\n');
         string line = wordList[Random.Range(0, wordList.Length -1)];
-        return line.Substring(0, line.Length-1);
+        return line.Substring(0, line.Length);
     }
     
     //When a letter is pressed, this will check whether that letter is found in the word the player is attempting to guess
@@ -115,6 +164,7 @@ public class script : MonoBehaviour
         for(int i = 0; i < word.Length; i++){
             
             if(inputLetter == word[i].ToString()){ //If the letter is found in the word
+                move();
                 letterInWord = true;
                 correct++;
                 wordbox.GetComponentsInChildren<TextMeshProUGUI>()[i].text = inputLetter;
@@ -131,14 +181,24 @@ public class script : MonoBehaviour
     
     //Determines if the game is failed or if the word has been guessed
     private void checkOutCome(){
+        UpdateText();
         //win
         if(correct == word.Length){
             //Makes the guessed word green
             for(int i = 0; i < word.Length; i++){
                 wordbox.GetComponentsInChildren<TextMeshProUGUI>()[i].color = Color.green;
             }
+            wordCount++;
             //code to reset the game and start a new one
-            Invoke("InitializeGame", 3f);
+            if(wordCount != 4){
+                Invoke("RestartGame", 3f);
+                guessedWordCount++;
+                Debug.Log("@@@@@@@@@@@Game Restarting");
+            }
+            else{
+                Invoke("InitializeGame", 3f);
+                Debug.Log("@@@@@@@@@@@Game Reseting****************");
+            }
         }
         //lose
         if(incorrect == climbinStages.Length) {
@@ -148,10 +208,30 @@ public class script : MonoBehaviour
                 wordbox.GetComponentsInChildren<TextMeshProUGUI>()[i].text = word[i].ToString();
             }
             //restarts the game
-            Invoke("InitializeGame", 3f);
+            if(wordCount != 4){
+                Invoke("RestartGame", 3f);
+                wordCount++;
+                Debug.Log("@@@@@@@@@@@Game Restarting");
+            }
+            else{
+                Invoke("InitializeGame", 3f);
+                Debug.Log("@@@@@@@@@@@Game Reseting****************");
+            }
         }
     }
+
+    private void move(){
+        playerChar.transform.position += Vector3.up *10f;
+        Debug.Log("Player was moved");
+    }
+
+    private void activateButton(int buttonIndex){
+        btn[buttonIndex].GetComponent<Button>().interactable = false;
+    }
+
     void Update(){
+
+        btn  = GameObject.FindGameObjectsWithTag("Button");
         //List: ban, ana, can, dan, ear, fat, gat, hin, ing, jin, kin, lin, mde, nop, oer, por, qur, ret, ste, tub, unb, ver, wea, xas, yus, zus
         if(Input.GetKeyDown(KeyCode.A)){
             Debug.Log("A was pressed");
@@ -159,6 +239,7 @@ public class script : MonoBehaviour
             CheckLetter("A");
             Debug.Log("BANANALOCK");
             ana = true;}
+            activateButton(0);
         }
 
         if(Input.GetKeyDown(KeyCode.B)){
@@ -167,6 +248,7 @@ public class script : MonoBehaviour
             CheckLetter("B");
             Debug.Log("BANANALOCK");
             ban = true;}
+            activateButton(1);
         }
 
         if(Input.GetKeyDown(KeyCode.C)){
@@ -175,6 +257,7 @@ public class script : MonoBehaviour
             CheckLetter("C");
             Debug.Log("BANANALOCK");
             can = true;}
+            activateButton(2);
         }
 
         if(Input.GetKeyDown(KeyCode.D)){
@@ -183,6 +266,7 @@ public class script : MonoBehaviour
             CheckLetter("D");
             Debug.Log("BANANALOCK");
             dan = true;}
+            activateButton(3);
         }
 
         if(Input.GetKeyDown(KeyCode.E)){
@@ -191,6 +275,7 @@ public class script : MonoBehaviour
             CheckLetter("E");
             Debug.Log("BANANALOCK");
             ear = true;}
+            activateButton(4);
         }
 
         if(Input.GetKeyDown(KeyCode.F)){
@@ -199,6 +284,7 @@ public class script : MonoBehaviour
             CheckLetter("F");
             Debug.Log("BANANALOCK");
             fat = true;}
+            activateButton(5);
         }
 
         if(Input.GetKeyDown(KeyCode.G)){
@@ -207,6 +293,7 @@ public class script : MonoBehaviour
             CheckLetter("G");
             Debug.Log("BANANALOCK");
             gat = true;}
+            activateButton(6);
         }
 
         if(Input.GetKeyDown(KeyCode.H)){
@@ -215,6 +302,7 @@ public class script : MonoBehaviour
             CheckLetter("H");
             Debug.Log("BANANALOCK");
             hin = true;}
+            activateButton(7);
         }
 
         if(Input.GetKeyDown(KeyCode.I)){
@@ -223,6 +311,7 @@ public class script : MonoBehaviour
             CheckLetter("I");
             Debug.Log("BANANALOCK");
             ing = true;}
+            activateButton(8);
         }
         if(Input.GetKeyDown(KeyCode.J)){
             Debug.Log("J was pressed");
@@ -230,6 +319,7 @@ public class script : MonoBehaviour
             CheckLetter("J");
             Debug.Log("BANANALOCK");
             jin = true;}
+            activateButton(9);
         }
         if(Input.GetKeyDown(KeyCode.K)){
             Debug.Log("K was pressed");
@@ -237,6 +327,7 @@ public class script : MonoBehaviour
             CheckLetter("K");
             Debug.Log("BANANALOCK");
             kin = true;}
+            activateButton(10);
         }
         if(Input.GetKeyDown(KeyCode.L)){
             Debug.Log("L was pressed");
@@ -244,6 +335,7 @@ public class script : MonoBehaviour
             CheckLetter("L");
             Debug.Log("BANANALOCK");
             lin = true;}
+            activateButton(11);
         }
         if(Input.GetKeyDown(KeyCode.M)){
             Debug.Log("M was pressed");
@@ -251,6 +343,7 @@ public class script : MonoBehaviour
             CheckLetter("M");
             Debug.Log("BANANALOCK");
             mde = true;}
+            activateButton(12);
         }
 
         if(Input.GetKeyDown(KeyCode.N)){
@@ -259,6 +352,7 @@ public class script : MonoBehaviour
             CheckLetter("N");
             Debug.Log("BANANALOCK");
             nop = true;}
+            activateButton(13);
         }
 
         if(Input.GetKeyDown(KeyCode.O)){
@@ -267,6 +361,7 @@ public class script : MonoBehaviour
             CheckLetter("O");
             Debug.Log("BANANALOCK");
             oer = true;}
+            activateButton(14);
         }
 
         if(Input.GetKeyDown(KeyCode.P)){
@@ -275,6 +370,7 @@ public class script : MonoBehaviour
             CheckLetter("P");
             Debug.Log("BANANALOCK");
             por = true;}
+            activateButton(15);
         }
 
         if(Input.GetKeyDown(KeyCode.Q)){
@@ -283,6 +379,7 @@ public class script : MonoBehaviour
             CheckLetter("Q");
             Debug.Log("BANANALOCK");
             qur = true;}
+            activateButton(16);
         }
 
         if(Input.GetKeyDown(KeyCode.R)){
@@ -291,6 +388,7 @@ public class script : MonoBehaviour
             CheckLetter("R");
             Debug.Log("BANANALOCK");
             ret = true;}
+            activateButton(17);
         }
 
         if(Input.GetKeyDown(KeyCode.S)){
@@ -299,6 +397,7 @@ public class script : MonoBehaviour
             CheckLetter("S");
             Debug.Log("BANANALOCK");
             ste = true;}
+            activateButton(18);
         }
 
         if(Input.GetKeyDown(KeyCode.T)){
@@ -307,6 +406,7 @@ public class script : MonoBehaviour
             CheckLetter("T");
             Debug.Log("BANANALOCK");
             tub = true;}
+            activateButton(19);
         }
 
         if(Input.GetKeyDown(KeyCode.U)){
@@ -315,6 +415,7 @@ public class script : MonoBehaviour
             CheckLetter("U");
             Debug.Log("BANANALOCK");
             unb = true;}
+            activateButton(20);
         }
 
         if(Input.GetKeyDown(KeyCode.V)){
@@ -323,6 +424,7 @@ public class script : MonoBehaviour
             CheckLetter("V");
             Debug.Log("BANANALOCK");
             ver = true;}
+            activateButton(21);
         }
 
         if(Input.GetKeyDown(KeyCode.W)){
@@ -331,6 +433,7 @@ public class script : MonoBehaviour
             CheckLetter("W");
             Debug.Log("BANANALOCK");
             wea = true;}
+            activateButton(22);
         }
 
         if(Input.GetKeyDown(KeyCode.X)){
@@ -339,6 +442,7 @@ public class script : MonoBehaviour
             CheckLetter("X");
             Debug.Log("BANANALOCK");
             xas = true;}
+            activateButton(23);
         }
 
         if(Input.GetKeyDown(KeyCode.Y)){
@@ -347,6 +451,7 @@ public class script : MonoBehaviour
             CheckLetter("Y");
             Debug.Log("BANANALOCK");
             yus = true;}
+            activateButton(24);
         }
 
         if(Input.GetKeyDown(KeyCode.Z)){
@@ -355,6 +460,7 @@ public class script : MonoBehaviour
             CheckLetter("Z");
             Debug.Log("BANANALOCK");
             zus = true;}
+            activateButton(25);
         }
     }
 }
