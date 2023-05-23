@@ -16,14 +16,12 @@ public class script : MonoBehaviour
     [SerializeField] TextAsset possibleWord; //the word the player is attempting to guess
     [SerializeField] GameObject playerChar; //player
     [SerializeField] GameObject playerSpawn; //spawnpoint
-    public Text wordCountTxt; //updates the correct guessed
+
     //LETTER VARS
     bool ban, ana, can, dan, ear, fat, gat, hin, ing, jin, kin, lin, mde, nop, oer, por, qur, ret, ste, tub, unb, ver, wea, xas, yus, zus, playerActive;
     //Button Var
     GameObject[] btn;
     //Counter
-    int wordCount;
-    int guessedWordCount;
 
     private void ResetKeyboard(){
         //ban, ana, can, dan, ear, fat, gat, hin, ing, jin, kin, lin, mde, nop, oer, por, qur, ret, ste, tub, unb, ver, wea, xas, yus, zus
@@ -65,7 +63,6 @@ public class script : MonoBehaviour
     {
         InitializeButtons();
         InitializeGame();
-        InitializeText();
     }
     //This will create the displays for the the keyboard
     private void InitializeButtons()
@@ -76,23 +73,13 @@ public class script : MonoBehaviour
             CreateButton(i);
         }
     }
-    private void InitializeText(){
-        wordCount = 0;
-        guessedWordCount = 0;
-        Instantiate(wordCountTxt, playerSpawn.transform);
-    }
-    private void UpdateText(){
-        wordCountTxt.GetComponent<Text>().text = "Words Guessed: " + guessedWordCount +"/" + wordCount;
-        Debug.Log("&&&&&&Text Updated&&&&& " +guessedWordCount + " / " + wordCount);
-    }
     private void InitializeGame() {
         //reset data
         incorrect = 0;
         correct = 0;
-        wordCount = 0;
-        guessedWordCount = 0;
+        
     
-        CreatePlayer();
+        //CreatePlayer();
         foreach(Button child in keyboardDisplay.GetComponentsInChildren<Button>()){
             child.interactable = true;
         }
@@ -150,6 +137,9 @@ public class script : MonoBehaviour
             playerActive = true;
         }
     }
+    private void ResetPlayer(){
+        Instantiate(playerChar, playerSpawn.transform);
+    }
     //Selects a word from the possible word bank (a txt file with 5 letter words)
     private string generateWord(){
         string[] wordList = possibleWord.text.Split('\n');
@@ -181,23 +171,12 @@ public class script : MonoBehaviour
     
     //Determines if the game is failed or if the word has been guessed
     private void checkOutCome(){
-        UpdateText();
         //win
         if(correct == word.Length){
             //Makes the guessed word green
             for(int i = 0; i < word.Length; i++){
                 wordbox.GetComponentsInChildren<TextMeshProUGUI>()[i].color = Color.green;
-            }
-            wordCount++;
-            //code to reset the game and start a new one
-            if(wordCount != 4){
-                Invoke("RestartGame", 3f);
-                guessedWordCount++;
-                Debug.Log("@@@@@@@@@@@Game Restarting");
-            }
-            else{
-                Invoke("InitializeGame", 3f);
-                Debug.Log("@@@@@@@@@@@Game Reseting****************");
+                Invoke("RestartGame", 3.0f);
             }
         }
         //lose
@@ -206,22 +185,13 @@ public class script : MonoBehaviour
             for(int i = 0; i < word.Length; i++){
                 wordbox.GetComponentsInChildren<TextMeshProUGUI>()[i].color = Color.red;
                 wordbox.GetComponentsInChildren<TextMeshProUGUI>()[i].text = word[i].ToString();
-            }
-            //restarts the game
-            if(wordCount != 4){
-                Invoke("RestartGame", 3f);
-                wordCount++;
-                Debug.Log("@@@@@@@@@@@Game Restarting");
-            }
-            else{
-                Invoke("InitializeGame", 3f);
-                Debug.Log("@@@@@@@@@@@Game Reseting****************");
+                Invoke("RestartGame", 3.0f);
             }
         }
     }
 
     private void move(){
-        playerChar.transform.position += Vector3.up *10f;
+        playerChar.transform.position += Vector3.up *0.5f;
         Debug.Log("Player was moved");
     }
 
@@ -230,7 +200,15 @@ public class script : MonoBehaviour
     }
 
     void Update(){
-
+        //******************rest */
+        if(Input.GetKeyDown(KeyCode.UpArrow)){
+            Debug.Log("******UUUPPPP*****");
+            move();
+        }
+        if(Input.GetKeyDown(KeyCode.DownArrow)){
+            Debug.Log("******PLAYER RESET*****");
+            ResetPlayer();
+        }
         btn  = GameObject.FindGameObjectsWithTag("Button");
         //List: ban, ana, can, dan, ear, fat, gat, hin, ing, jin, kin, lin, mde, nop, oer, por, qur, ret, ste, tub, unb, ver, wea, xas, yus, zus
         if(Input.GetKeyDown(KeyCode.A)){
