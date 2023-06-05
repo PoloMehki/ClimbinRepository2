@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using TMPro;
 
 //ALL CODE IS IN C#
@@ -231,7 +232,7 @@ public class script : MonoBehaviour
 
     void Update(){
 
-        btn  = GameObject.FindGameObjectsWithTag("Button");
+        btn = GameObject.FindGameObjectsWithTag("Button");
         //List: ban, ana, can, dan, ear, fat, gat, hin, ing, jin, kin, lin, mde, nop, oer, por, qur, ret, ste, tub, unb, ver, wea, xas, yus, zus
         if(Input.GetKeyDown(KeyCode.A)){
             Debug.Log("A was pressed");
@@ -462,5 +463,14 @@ public class script : MonoBehaviour
             zus = true;}
             activateButton(25);
         }
+    }
+
+    public void End () {
+        if (onTimerEndAction != null){
+            onTimerEndAction.Invoke();
+        }
+        StopAllCoroutines ();
+        Invoke("RestartGame", 3f);
+        ResetTimer ();
     }
 }
