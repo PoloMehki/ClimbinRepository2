@@ -11,10 +11,16 @@ public class Timer : MonoBehaviour
     [SerializeField] private Image uiFillImage; //the image filling/decreasing
     [SerializeField] private TMP_Text uiText; //timer text (minutes & seconds)
 
+<<<<<<< Updated upstream
+=======
+    public int Duration {get; private set;}
+    //public bool IsPaused {get; private set;} COMMENTED BECAUSE PAUSE FUNCTION IS IN OWN SCRIPT
+>>>>>>> Stashed changes
 
     public int Duration {get; private set;}
     //public bool IsPaused {get; private set;} COMMENTED BECAUSE PAUSE FUNCTION IS IN OWN SCRIPT
 
+<<<<<<< Updated upstream
     public int remainingDuration; //the current time
 
     //EVENTS
@@ -26,6 +32,14 @@ public class Timer : MonoBehaviour
     //Scene instance
     //ChangeScene endScene = AddComponent<ChangeScene>(gameObject);
 
+=======
+    //EVENTS
+    private UnityAction onTimerBeginAction ;
+    private UnityAction <int> onTimerChangeAction;
+    private UnityAction onTimerEndAction ;
+    //private UnityAction <bool> onTimerPausedAction ;
+
+>>>>>>> Stashed changes
     
     private void Awake () {
         ResetTimer ();
@@ -135,15 +149,26 @@ public class Timer : MonoBehaviour
         if (onTimerEndAction != null){
             onTimerEndAction.Invoke();
         }
+<<<<<<< Updated upstream
         
         StopAllCoroutines ();
         ResetTimer ();
 
+=======
+        StopAllCoroutines ();
+        ResetTimer ();
+        Invoke("RestartGame", 3f);
+        Debug.Log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&STOP");
+>>>>>>> Stashed changes
     }
 
     private void OnDestroy() {
         StopAllCoroutines ();
     }
 
+<<<<<<< Updated upstream
 }
 
+=======
+}
+>>>>>>> Stashed changes

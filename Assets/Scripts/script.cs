@@ -22,6 +22,8 @@ public class script : MonoBehaviour
     //Button Var
     GameObject[] btn;
     //Counter
+    int upCount;
+    int downCount;
 
     private void ResetKeyboard(){
         //ban, ana, can, dan, ear, fat, gat, hin, ing, jin, kin, lin, mde, nop, oer, por, qur, ret, ste, tub, unb, ver, wea, xas, yus, zus
@@ -77,6 +79,8 @@ public class script : MonoBehaviour
         //reset data
         incorrect = 0;
         correct = 0;
+        upCount = 0;
+        downCount = 0;
         
     
         //CreatePlayer();
@@ -98,10 +102,12 @@ public class script : MonoBehaviour
         ResetKeyboard();
         
     }
-    private void RestartGame() {
+    public void RestartGame() {
         //reset data
         incorrect = 0;
         correct = 0;
+        upCount = 0;
+        downCount = 0;
         foreach(Button child in keyboardDisplay.GetComponentsInChildren<Button>()){
             child.interactable = true;
         }
@@ -155,6 +161,8 @@ public class script : MonoBehaviour
             
             if(inputLetter == word[i].ToString()){ //If the letter is found in the word
                 move();
+                upCount++;
+                downCount--;
                 letterInWord = true;
                 correct++;
                 wordbox.GetComponentsInChildren<TextMeshProUGUI>()[i].text = inputLetter;
@@ -162,6 +170,11 @@ public class script : MonoBehaviour
         }
         if(letterInWord == false){ //If the letter is not found in the word
             incorrect++;
+            if(downCount >= 0 && upCount >= downCount){
+                moveDown();
+                downCount++;
+                upCount--;
+            }
             //changes the stage to move the character down one tile
             climbinStages[incorrect -1].SetActive(true);
         }
@@ -193,6 +206,12 @@ public class script : MonoBehaviour
     private void move(){
         playerChar.transform.position += Vector3.up *0.5f;
         Debug.Log("Player was moved");
+        
+    }
+    private void moveDown(){
+        playerChar.transform.position += Vector3.down *0.25f;
+        Debug.Log("Player was lowered");
+        
     }
 
     private void activateButton(int buttonIndex){
@@ -201,6 +220,7 @@ public class script : MonoBehaviour
 
     void Update(){
         //******************rest */
+        
         if(Input.GetKeyDown(KeyCode.UpArrow)){
             Debug.Log("******UUUPPPP*****");
             move();
